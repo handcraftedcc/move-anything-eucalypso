@@ -39,7 +39,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.ref_name }}
-          generate_release_notes: true
+          body: |
+            Fixed: published test release artifact for `${{ github.ref_name }}` from commit `${{ github.sha }}`.
+            Not changed: no additional DSP/UI behavior changes were introduced while tagging this release.
           files: dist/eucalypso-module.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
