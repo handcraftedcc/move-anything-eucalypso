@@ -25,7 +25,6 @@
 #define DEFAULT_BPM 120
 #define DEFAULT_SCALE_BASE_NOTE 48
 
-#define CLOCK_START_GRACE_TICKS 1
 #define CLOCK_OUTPUT_DELAY_TICKS 1
 #define MAX_PENDING_STEP_TRIGGERS 64
 
@@ -151,7 +150,7 @@ typedef struct {
     uint64_t clock_tick_total;
     int pending_step_triggers;
     int delayed_step_triggers;
-    int internal_start_grace_armed;
+    int midi_transport_active;
     uint64_t global_step_index;
 
     uint8_t voice_notes[MAX_VOICES];
@@ -1662,7 +1661,7 @@ static void *eucalypso_create_instance(const char *module_dir, const char *confi
     inst->clock_tick_total = 0;
     inst->pending_step_triggers = 0;
     inst->delayed_step_triggers = 0;
-    inst->internal_start_grace_armed = 0;
+    inst->midi_transport_active = 0;
     inst->global_step_index = 0;
     inst->voice_count = 0;
 
@@ -1693,6 +1692,7 @@ static int eucalypso_process_midi(void *instance, const uint8_t *in_msg, int in_
 
     if (inst->sync_mode == SYNC_CLOCK) {
         if (status == 0xFA) {
+            inst->midi_transport_active = 1;
             inst->clock_running = 1;
             inst->clock_counter = 0;
             inst->clock_tick_total = 0;
@@ -1702,12 +1702,14 @@ static int eucalypso_process_midi(void *instance, const uint8_t *in_msg, int in_
             return 0;
         }
         if (status == 0xFB) {
+            inst->midi_transport_active = 1;
             inst->clock_running = 1;
             inst->pending_step_triggers = 0;
             inst->delayed_step_triggers = 0;
             return 0;
         }
         if (status == 0xFC) {
+            inst->midi_transport_active = 0;
             inst->clock_running = 0;
             inst->clock_counter = 0;
             inst->pending_step_triggers = 0;
@@ -1720,18 +1722,18 @@ static int eucalypso_process_midi(void *instance, const uint8_t *in_msg, int in_
         }
     } else {
         if (status == 0xFA || status == 0xFB) {
+            inst->midi_transport_active = 1;
             if (inst->timing_dirty && inst->sample_rate > 0) recalc_timing(inst, inst->sample_rate);
             inst->swing_phase = 0;
             inst->internal_sample_total = 0;
             inst->samples_until_step_f = inst->step_interval_base_f > 0.0 ? inst->step_interval_base_f : 1.0;
             inst->samples_until_step = (int)(inst->samples_until_step_f + 0.5);
             if (inst->samples_until_step < 1) inst->samples_until_step = 1;
-            inst->internal_start_grace_armed = 1;
             reset_phrase(inst);
             return 0;
         }
         if (status == 0xFC) {
-            inst->internal_start_grace_armed = 0;
+            inst->midi_transport_active = 0;
             return handle_transport_stop(inst, out_msgs, out_lens, max_out);
         }
     }
@@ -1742,24 +1744,22 @@ static int eucalypso_process_midi(void *instance, const uint8_t *in_msg, int in_
         live_before = live_note_count(inst);
         if (type == 0x90 && vel > 0) {
             note_on(inst, note, vel);
+            /* Note-on can anchor only before MIDI transport has become active. */
             if (inst->sync_mode == SYNC_CLOCK &&
                 inst->clock_running &&
+                !inst->midi_transport_active &&
                 inst->register_mode == REG_HELD &&
                 live_before == 0 &&
                 live_note_count(inst) > 0 &&
-                inst->pending_step_triggers == 0 &&
-                inst->delayed_step_triggers == 0 &&
-                inst->clock_counter <= CLOCK_START_GRACE_TICKS &&
                 max_out > 0) {
                 return run_step(inst, out_msgs, out_lens, max_out);
             }
             if (inst->sync_mode == SYNC_INTERNAL &&
                 inst->register_mode == REG_HELD &&
-                inst->internal_start_grace_armed &&
+                !inst->midi_transport_active &&
                 live_before == 0 &&
                 live_note_count(inst) > 0 &&
                 max_out > 0) {
-                inst->internal_start_grace_armed = 0;
                 count = run_step(inst, out_msgs, out_lens, max_out);
                 inst->samples_until_step_f = next_step_interval(inst);
                 if (inst->samples_until_step_f < 1.0) inst->samples_until_step_f = 1.0;
