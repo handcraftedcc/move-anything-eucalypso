@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - "main"
     tags:
       - "v*"
   workflow_dispatch:
@@ -30,13 +32,14 @@ jobs:
         run: |
           chmod +x scripts/build.sh scripts/build-module.sh
           MOVE_ANYTHING_SRC="$GITHUB_WORKSPACE/.deps/move-anything/src" ./scripts/build-module.sh
-          test -f dist/superarp-module.tar.gz
+          test -f dist/eucalypso-module.tar.gz
 
       - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.ref_name }}
           generate_release_notes: true
-          files: dist/superarp-module.tar.gz
+          files: dist/eucalypso-module.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
