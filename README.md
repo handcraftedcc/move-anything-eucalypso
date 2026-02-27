@@ -49,6 +49,16 @@ Eucalypso is a MIDI FX module:
 3. Route output to a synth/sampler module
 4. Configure timing in **Global**, note pool behavior in **Note Register**, and pattern behavior in each **Lane**
 
+## Note Emission Behavior
+
+- Timing always advances from transport/clock; lane rhythm phase does not depend on incoming note timing.
+- Note output is gated by the active note state:
+- `hold` mode: output only while notes are physically held.
+- `latch` mode: output from the latched note set after keys are released, until that set is replaced.
+- `register_mode=held`: lane note indices select from the active held/latched note register.
+- `register_mode=scale`: lane note indices select from the configured scale register, but output is still gated by active held/latched state.
+- If a lane note index is out of register range, `missing_note_policy` decides behavior (`skip` default, `fold`, `wrap`, or seeded `random`).
+
 ## Parameters
 
 In Shadow UI, parameters are organized into sections.
