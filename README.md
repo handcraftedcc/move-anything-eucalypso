@@ -78,6 +78,8 @@ In Shadow UI, parameters are organized into sections.
 | `register_mode` (`Reg Mode`) | Builds note register from `held` notes or selected `scale`. |
 | `held_order` (`Note Ord`) | Note ordering: `up`, `down`, `played`, `rand`. |
 | `held_order_seed` (`Rand Ord Seed`) | Seed for randomized note order mode. |
+| `missing_note_policy` (`Miss Pol`) | Out-of-range lane note behavior: `skip`, `fold`, `wrap`, `random`. |
+| `missing_note_seed` (`Miss Seed`) | Seed for randomized missing-note resolution. |
 | `scale_mode` (`Scale`) | Chooses the active scale set for `scale` register mode. |
 | `scale_rng` (`Scale Rng`) | Number of scale steps available in register (`1-24`). |
 | `root_note` (`Root`) | Root note (`0-11`). |
