@@ -78,6 +78,9 @@ ${CROSS_PREFIX}gcc -g -O3 -fPIC -shared \
 # Copy files to dist (use cat to avoid ExtFS deallocation issues with Docker)
 echo "Packaging..."
 cat src/module.json > dist/eucalypso/module.json
+if [ -f "src/help.json" ]; then
+    cat src/help.json > dist/eucalypso/help.json
+fi
 cat build/dsp.so > dist/eucalypso/dsp.so
 chmod +x dist/eucalypso/dsp.so
 
