@@ -206,6 +206,38 @@ static const int k_scale_blues[] = { 0, 3, 5, 6, 7, 10 };
 static const int k_scale_whole_tone[] = { 0, 2, 4, 6, 8, 10 };
 static const int k_scale_chromatic[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
+static int eucalypso_query_clock_status(const eucalypso_instance_t *inst) {
+    if (g_host && g_host->get_clock_status) {
+        return g_host->get_clock_status();
+    }
+
+    if (inst && inst->clock_running) {
+        return MOVE_CLOCK_STATUS_RUNNING;
+    }
+    return MOVE_CLOCK_STATUS_STOPPED;
+}
+
+static int eucalypso_get_sync_warning(eucalypso_instance_t *inst, char *buf, int buf_len) {
+    int status;
+
+    if (!inst || !buf || buf_len < 1) return -1;
+    if (inst->sync_mode != SYNC_CLOCK) {
+        buf[0] = '\0';
+        return 0;
+    }
+
+    status = eucalypso_query_clock_status(inst);
+    if (status == MOVE_CLOCK_STATUS_UNAVAILABLE) {
+        return snprintf(buf, buf_len, "Enable MIDI Clock Out in Move settings");
+    }
+    if (status == MOVE_CLOCK_STATUS_STOPPED) {
+        return snprintf(buf, buf_len, "Clock out enabled, transport stopped");
+    }
+
+    buf[0] = '\0';
+    return 0;
+}
+
 #if EUCALYPSO_DEBUG_LOG
 static void dlog(eucalypso_instance_t *inst, const char *fmt, ...) {
     va_list ap;
@@ -1514,6 +1546,7 @@ static int eucalypso_get_param(void *instance, const char *key, char *buf, int b
     if (strcmp(key, "retrigger_mode") == 0) return snprintf(buf, buf_len, "%s", retrigger_to_string(inst->retrigger_mode));
     if (strcmp(key, "rate") == 0) return snprintf(buf, buf_len, "%s", rate_to_string(inst->rate));
     if (strcmp(key, "sync") == 0) return snprintf(buf, buf_len, "%s", sync_to_string(inst->sync_mode));
+    if (strcmp(key, "error") == 0) return eucalypso_get_sync_warning(inst, buf, buf_len);
     if (strcmp(key, "bpm") == 0) return snprintf(buf, buf_len, "%d", inst->bpm);
     if (strcmp(key, "swing") == 0) return snprintf(buf, buf_len, "%d", inst->swing);
     if (strcmp(key, "max_voices") == 0) return snprintf(buf, buf_len, "%d", inst->max_voices);
