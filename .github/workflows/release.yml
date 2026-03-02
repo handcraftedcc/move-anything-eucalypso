@@ -55,11 +55,8 @@ jobs:
           if [ -f "$NOTES_FILE" ]; then
             cp "$NOTES_FILE" "$RUNNER_TEMP/release-notes.md"
           else
-            cat > "$RUNNER_TEMP/release-notes.md" <<EOF
-            Release ${GITHUB_REF_NAME}
-
-            Module artifact built and published from commit ${GITHUB_SHA}.
-            EOF
+            printf 'Release %s\n\nModule artifact built and published from commit %s.\n' \
+              "$GITHUB_REF_NAME" "$GITHUB_SHA" > "$RUNNER_TEMP/release-notes.md"
           fi
 
       - name: Create GitHub release
