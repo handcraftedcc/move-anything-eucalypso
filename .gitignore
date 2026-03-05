@@ -5,6 +5,8 @@ dist/
 # Local/dev-only artifacts
 .backup/
 agentfiles/
+!agentfiles/
+!agentfiles/release-workflow.md
 scripts/build-local.sh
 scripts/install-local.sh
 
