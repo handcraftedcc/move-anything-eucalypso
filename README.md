@@ -108,7 +108,7 @@ Each lane has the same control set.
 | `laneX_rotation` (`Rot`) | Rotates lane pattern start. |
 | `laneX_drop` (`Drop %`) | Drop chance amount (`0-100`). |
 | `laneX_drop_seed` (`Drop Seed`) | Seed for lane drop decisions. |
-| `laneX_note` (`Note`) | Register index used by the lane (`1-24`). |
+| `laneX_note` (`Note`) | Register index used by the lane (`1-24`; in `drumpad` mode, selects drumpad index within the active register size). |
 | `laneX_n_rnd` (`Note Rnd`) | Chance/amount to swap with a random register note. |
 | `laneX_n_seed` (`Note Seed`) | Seed for lane note randomization. |
 | `laneX_octave` (`Oct`) | Lane octave offset (`-3` to `+3`). |
@@ -124,11 +124,13 @@ Each lane has the same control set.
 - Verify Eucalypso is receiving MIDI notes
 - Check lane `On`, `Steps`, and `Pulse` settings
 - In `clock` sync mode, ensure external MIDI clock start/tick is present
+- In `register_mode=drumpad`, hold/latch drumpad 1-4 to gate lanes 1-4
 
 **Unexpected note choices:**
 - Check `register_mode` and `held_order`
 - Verify `Scale`, `Scale Rng`, `Root`, and `Oct` values
 - Review lane `Note`, `Note Rnd`, `Note Seed`, and `Oct` settings
+- In `register_mode=drumpad`, `Scale Rng` controls how many drumpad notes (`36-51`) are available
 
 **Timing behavior feels off:**
 - Confirm `retrigger_mode` (`restart` vs `cont`)

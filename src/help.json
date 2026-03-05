@@ -51,7 +51,8 @@
     "troubleshooting": {
       "Unexpected pitches": "Verify `register_mode`, then check `held_order` or `scale_mode/root_note/scale_rng`.",
       "Random behavior changes every trigger": "Use fixed seeds (`held_order_seed`, `missing_note_seed`) for repeatable output.",
-      "High lane note indices produce silence": "Set `missing_note_policy` to `fold`, `wrap`, or `random` instead of `skip`."
+      "High lane note indices produce silence": "Set `missing_note_policy` to `fold`, `wrap`, or `random` instead of `skip`.",
+      "Drumpad lane is silent": "In `register_mode=drumpad`, hold/latch drumpad 1-4 to gate lanes 1-4, and keep `scale_rng` high enough to include the lane note index."
     }
   },
   "lane1": {
