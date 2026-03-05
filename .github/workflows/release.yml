@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    branches:
-      - "main"
     tags:
       - "v*"
   workflow_dispatch:
@@ -48,23 +46,11 @@ jobs:
             exit 1
           fi
 
-      - name: Prepare release notes
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          NOTES_FILE="$GITHUB_WORKSPACE/release-notes/${GITHUB_REF_NAME}.md"
-          if [ -f "$NOTES_FILE" ]; then
-            cp "$NOTES_FILE" "$RUNNER_TEMP/release-notes.md"
-          else
-            printf 'Release %s\n\nModule artifact built and published from commit %s.\n' \
-              "$GITHUB_REF_NAME" "$GITHUB_SHA" > "$RUNNER_TEMP/release-notes.md"
-          fi
-
       - name: Create GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.ref_name }}
-          body_path: ${{ runner.temp }}/release-notes.md
+          generate_release_notes: true
           files: dist/eucalypso-module.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
