@@ -27,6 +27,8 @@
 #define DEFAULT_BPM 120
 #define DEFAULT_SAMPLE_RATE 44100
 #define SCALE_BASE_NOTE 60
+#define DRUMPAD_BASE_NOTE 36
+#define DRUMPAD_COUNT 16
 #define CLOCK_START_GRACE_TICKS 2
 #define EUCALYPSO_DEBUG_LOG 1
 #define EUCALYPSO_LOG_PATH "/data/UserData/move-anything/eucalypso.log"
@@ -60,7 +62,8 @@ typedef enum {
 
 typedef enum {
     REGISTER_HELD = 0,
-    REGISTER_SCALE
+    REGISTER_SCALE,
+    REGISTER_DRUMPAD
 } register_mode_t;
 
 typedef enum {
@@ -561,6 +564,18 @@ static int build_scale_register(const eucalypso_instance_t *inst, int *notes, in
     return count;
 }
 
+static int build_drumpad_register(const eucalypso_instance_t *inst, int *notes, int max_notes) {
+    int i;
+    int count;
+    if (!inst || !notes || max_notes <= 0) return 0;
+    count = clamp_int(inst->scale_rng, 1, DRUMPAD_COUNT);
+    if (count > max_notes) count = max_notes;
+    for (i = 0; i < count; i++) {
+        notes[i] = DRUMPAD_BASE_NOTE + i;
+    }
+    return count;
+}
+
 static void shuffle_notes(int *notes, int count, uint32_t seed) {
     int i;
     uint32_t state = seed ? seed : 1u;
@@ -607,10 +622,21 @@ static int build_held_register(const eucalypso_instance_t *inst, int *notes, int
 
 static int build_register(const eucalypso_instance_t *inst, int *notes, int max_notes) {
     if (!inst || !notes || max_notes <= 0) return 0;
+    if (inst->register_mode == REGISTER_DRUMPAD) {
+        return build_drumpad_register(inst, notes, max_notes);
+    }
     if (inst->register_mode == REGISTER_SCALE) {
         return build_scale_register(inst, notes, max_notes);
     }
     return build_held_register(inst, notes, max_notes);
+}
+
+static int lane_gate_enabled_for_step(const eucalypso_instance_t *inst, int lane_idx) {
+    int gate_note;
+    if (!inst) return 0;
+    if (inst->register_mode != REGISTER_DRUMPAD) return 1;
+    gate_note = DRUMPAD_BASE_NOTE + clamp_int(lane_idx, 0, MAX_LANES - 1);
+    return arr_contains(inst->active_notes, inst->active_count, (uint8_t)gate_note);
 }
 
 static int octave_offset_count(int oct_rng) {
@@ -751,7 +777,9 @@ static const char *retrigger_to_string(retrigger_mode_t mode) {
 }
 
 static const char *register_mode_to_string(register_mode_t mode) {
-    return mode == REGISTER_SCALE ? "scale" : "held";
+    if (mode == REGISTER_SCALE) return "scale";
+    if (mode == REGISTER_DRUMPAD) return "drumpad";
+    return "held";
 }
 
 static const char *held_order_to_string(held_order_t mode) {
@@ -1090,6 +1118,7 @@ static int emit_anchor_step(eucalypso_instance_t *inst, uint64_t step_id,
         lane_t *lane = &inst->lanes[lane_idx];
         int note;
         if (!lane->enabled) continue;
+        if (!lane_gate_enabled_for_step(inst, lane_idx)) continue;
         if (!euclidean_trigger(rhythm_step, clamp_int(lane->steps, 1, 128),
                                clamp_int(lane->pulses, 0, 128),
                                lane->rotation)) {
@@ -1449,7 +1478,11 @@ static void eucalypso_set_param(void *instance, const char *key, const char *val
     else if (strcmp(key, "global_g_rnd") == 0) inst->global_g_rnd = clamp_int(atoi(val), 0, 1600);
     else if (strcmp(key, "global_rnd_seed") == 0) inst->global_rnd_seed = clamp_int(atoi(val), 0, 65535);
     else if (strcmp(key, "rand_cycle") == 0) inst->rand_cycle = clamp_int(atoi(val), 1, 128);
-    else if (strcmp(key, "register_mode") == 0) inst->register_mode = strcmp(val, "scale") == 0 ? REGISTER_SCALE : REGISTER_HELD;
+    else if (strcmp(key, "register_mode") == 0) {
+        if (strcmp(val, "scale") == 0) inst->register_mode = REGISTER_SCALE;
+        else if (strcmp(val, "drumpad") == 0) inst->register_mode = REGISTER_DRUMPAD;
+        else inst->register_mode = REGISTER_HELD;
+    }
     else if (strcmp(key, "held_order") == 0) {
         if (strcmp(val, "down") == 0) inst->held_order = HELD_DOWN;
         else if (strcmp(val, "played") == 0) inst->held_order = HELD_PLAYED;

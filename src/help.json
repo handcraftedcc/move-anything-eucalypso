@@ -32,20 +32,21 @@
     "purpose": "Controls how playable note pools are built and how lane note indices resolve into actual pitches.",
     "when_to_use": "Adjust this section when note choices, scale behavior, or out-of-range lane notes are not behaving as expected.",
     "param_effects": {
-      "register_mode": "`held` uses currently active notes; `scale` builds notes from scale/root/range settings.",
+      "register_mode": "`held` uses currently active notes; `scale` builds notes from scale/root/range settings; `drumpad` uses fixed pads 1-16 (`36-51`) and gates lanes by held/latching pad 1-4 for lanes 1-4.",
       "held_order": "Orders held-note register by pitch up/down, play order, or seeded random order.",
       "held_order_seed": "Sets deterministic order when `held_order=rand`.",
       "missing_note_policy": "Defines handling for lane note indices beyond register size (`skip`, `fold`, `wrap`, `random`).",
       "missing_note_seed": "Controls deterministic results for `missing_note_policy=random`.",
       "scale_mode": "Selects the scale template used when `register_mode=scale`.",
-      "scale_rng": "Sets how many scale steps are available to lane note indices.",
+      "scale_rng": "Sets register size: scale steps in `scale` mode, or included drumpad count (`1-16`) in `drumpad` mode.",
       "root_note": "Sets scale root pitch class (`0-11`).",
       "octave": "Global register octave offset applied before lane octave offsets."
     },
     "examples": [
       "For chord-following arps, use `register_mode=held`, `held_order=up`, and lane notes between 1 and register size.",
       "For scale-locked melodies, use `register_mode=scale`, set `scale_mode`, `root_note`, and a larger `scale_rng`.",
-      "When lanes miss notes, switch to `missing_note_policy=wrap` for circular indexing."
+      "When lanes miss notes, switch to `missing_note_policy=wrap` for circular indexing.",
+      "For lane-gated drum patterns, use `register_mode=drumpad`; hold/latch pad 1-4 to gate lanes 1-4, and set each lane `Note` to choose emitted pad note."
     ],
     "troubleshooting": {
       "Unexpected pitches": "Verify `register_mode`, then check `held_order` or `scale_mode/root_note/scale_rng`.",

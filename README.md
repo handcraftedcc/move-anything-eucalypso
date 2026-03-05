@@ -13,7 +13,7 @@ Eucalypso is a chainable MIDI FX module (`midi_fx`) for Move Everything. It gene
 - Per-lane register note index and octave offsets
 - Per-lane note randomization and octave randomization with dedicated seeds
 - Global velocity and gate randomization with shared seed/cycle controls
-- Note register modes for held notes or scale-derived notes
+- Note register modes for held notes, scale-derived notes, or fixed drumpad notes
 - Held-note ordering (up, down, played, rand with seed)
 - Scale selection, scale range, root, and base octave controls
 
@@ -57,6 +57,7 @@ Eucalypso is a MIDI FX module:
 - `latch` mode: output from the latched note set after keys are released, until that set is replaced.
 - `register_mode=held`: lane note indices select from the active held/latched note register.
 - `register_mode=scale`: lane note indices select from the configured scale register, but output is still gated by active held/latched state.
+- `register_mode=drumpad`: lane note indices select from fixed drumpad notes (`36-51`), and lane output is additionally gated by held/latching drumpad 1-4 for lanes 1-4.
 - If a lane note index is out of register range, `missing_note_policy` decides behavior (`skip` default, `fold`, `wrap`, or seeded `random`).
 
 ## Parameters
@@ -85,13 +86,13 @@ In Shadow UI, parameters are organized into sections.
 
 | Parameter | What it does |
 |---------|--------|
-| `register_mode` (`Reg Mode`) | Builds note register from `held` notes or selected `scale`. |
+| `register_mode` (`Reg Mode`) | Builds note register from `held`, selected `scale`, or fixed `drumpad` notes. |
 | `held_order` (`Note Ord`) | Note ordering: `up`, `down`, `played`, `rand`. |
 | `held_order_seed` (`Rand Ord Seed`) | Seed for randomized note order mode. |
 | `missing_note_policy` (`Miss Pol`) | Out-of-range lane note behavior: `skip`, `fold`, `wrap`, `random`. |
 | `missing_note_seed` (`Miss Seed`) | Seed for randomized missing-note resolution. |
 | `scale_mode` (`Scale`) | Chooses the active scale set for `scale` register mode. |
-| `scale_rng` (`Scale Rng`) | Number of scale steps available in register (`1-24`). |
+| `scale_rng` (`Scale Rng`) | Register size: scale steps (`1-24`) in `scale` mode, or included drumpads (`1-16`) in `drumpad` mode. |
 | `root_note` (`Root`) | Root note (`0-11`). |
 | `octave` (`Oct`) | Global register octave offset (`-3` to `+3`). |
 
