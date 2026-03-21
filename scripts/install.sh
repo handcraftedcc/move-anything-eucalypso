@@ -16,23 +16,23 @@ echo "=== Installing Eucalypso Module ==="
 
 # Deploy to Move - midi_fx subdirectory
 echo "Copying module to Move..."
-ssh ableton@move.local "mkdir -p /data/UserData/move-anything/modules/midi_fx/eucalypso"
-scp -r dist/eucalypso/* ableton@move.local:/data/UserData/move-anything/modules/midi_fx/eucalypso/
+ssh ableton@move.local "mkdir -p /data/UserData/schwung/modules/midi_fx/eucalypso"
+scp -r dist/eucalypso/* ableton@move.local:/data/UserData/schwung/modules/midi_fx/eucalypso/
 
 # Install chain presets if they exist
 if [ -d "src/chain_patches" ]; then
     echo "Installing chain presets..."
     if ls src/chain_patches/*.json 1>/dev/null 2>&1; then
-        scp src/chain_patches/*.json ableton@move.local:/data/UserData/move-anything/patches/
+        scp src/chain_patches/*.json ableton@move.local:/data/UserData/schwung/patches/
     fi
 fi
 
 # Set permissions so Module Store can update later
 echo "Setting permissions..."
-ssh ableton@move.local "chmod -R a+rw /data/UserData/move-anything/modules/midi_fx/eucalypso"
+ssh ableton@move.local "chmod -R a+rw /data/UserData/schwung/modules/midi_fx/eucalypso"
 
 echo ""
 echo "=== Install Complete ==="
-echo "Module installed to: /data/UserData/move-anything/modules/midi_fx/eucalypso/"
+echo "Module installed to: /data/UserData/schwung/modules/midi_fx/eucalypso/"
 echo ""
-echo "Restart Move Anything to load the new module."
+echo "Restart Schwung to load the new module."
