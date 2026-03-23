@@ -1,10 +1,10 @@
-# Eucalypso Module for Move Everything
+# Eucalypso Module for Schwung
 
-Euclidean MIDI sequencer module for Ableton Move, built for Move Everything.
+Euclidean MIDI sequencer module for Ableton Move, built for Schwung.
 
 ## Features
 
-Eucalypso is a chainable MIDI FX module (`midi_fx`) for Move Everything. It generates up to 4 parallel Euclidean lanes with deterministic timing and seeded per-lane note variation.
+Eucalypso is a chainable MIDI FX module (`midi_fx`) for Schwung. It generates up to 4 parallel Euclidean lanes with deterministic timing and seeded per-lane note variation.
 
 - Internal clock or external MIDI clock sync
 - Hold/latch play modes with restart/continuous retrigger behavior
@@ -19,7 +19,7 @@ Eucalypso is a chainable MIDI FX module (`midi_fx`) for Move Everything. It gene
 
 ## Prerequisites
 
-- [Move Everything](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
+- [Schwung](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
 - SSH access enabled: `http://move.local/development/ssh`
 
 ## Installation
@@ -28,7 +28,7 @@ Eucalypso is a chainable MIDI FX module (`midi_fx`) for Move Everything. It gene
 
 If Eucalypso is published in Module Store:
 
-1. Launch Move Everything on your Move
+1. Launch Schwung on your Move
 2. Select **Module Store**
 3. Navigate to **MIDI FX** -> **Eucalypso**
 4. Select **Install**
@@ -150,12 +150,12 @@ Build output:
 
 ## Credits
 
-- Move Everything framework and host APIs: Charles Vestal and contributors
+- Schwung framework and host APIs: Charles Vestal and contributors
 - Eucalypso implementation: move-anything-eucalypso project contributors
 
 ## AI Assistance Disclaimer
 
-This module is part of Move Everything and was developed with AI assistance, including Claude, Codex, and other AI assistants.
+This module is part of Schwung and was developed with AI assistance, including Claude, Codex, and other AI assistants.
 
 All architecture, implementation, and release decisions are reviewed by human maintainers.
 AI-assisted content may still contain errors, so validate functionality, security, and license compatibility before production use.

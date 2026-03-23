@@ -31,7 +31,7 @@
 #define DRUMPAD_COUNT 16
 #define CLOCK_START_GRACE_TICKS 2
 #define EUCALYPSO_DEBUG_LOG 1
-#define EUCALYPSO_LOG_PATH "/data/UserData/move-anything/eucalypso.log"
+#define EUCALYPSO_LOG_PATH "/data/UserData/schwung/eucalypso.log"
 
 typedef enum {
     PLAY_HOLD = 0,
